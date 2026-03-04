@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 500" width="1024" height="500">
+  <!-- 背景: 深蓝色渐变 -->
+  <defs>
+    <linearGradient id="bgGradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6200EE;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- 背景 -->
+  <rect x="0" y="0" width="1024" height="500" fill="url(#bgGradient2)"/>
+
+  <!-- 左侧: Logo 和标题 -->
+  <g transform="translate(80, 150)">
+    <!-- 麦克风图标 -->
+    <g transform="translate(60, 60)">
+      <rect x="-25" y="-45" width="50" height="80" rx="25" ry="25" fill="#ffffff"/>
+      <line x1="-25" y1="-20" x2="25" y2="-20" stroke="#6200EE" stroke-width="2"/>
+      <line x1="-25" y1="5" x2="25" y2="5" stroke="#6200EE" stroke-width="2"/>
+      <line x1="-25" y1="30" x2="25" y2="30" stroke="#6200EE" stroke-width="2"/>
+      <path d="M -12 40 L -12 55 Q -12 65 0 65 Q 12 65 12 55 L 12 40" fill="none" stroke="#ffffff" stroke-width="4"/>
+      <rect x="-18" y="65" width="36" height="6" rx="3" ry="3" fill="#ffffff"/>
+    </g>
+
+    <!-- 标题 -->
+    <text x="60" y="180" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="#ffffff">Home Launcher</text>
+    <text x="60" y="230" font-family="Arial, sans-serif" font-size="28" fill="#cccccc">让手机回归 AI</text>
+  </g>
+
+  <!-- 右侧: 功能展示 -->
+  <g transform="translate(450, 80)">
+    <!-- 功能卡片 1: 开机直达 -->
+    <g transform="translate(0, 0)">
+      <rect x="0" y="0" width="240" height="120" rx="12" fill="#ffffff" fill-opacity="0.1"/>
+      <text x="120" y="45" font-family="Arial, sans-serif" font-size="24" fill="#ffffff" text-anchor="middle">🚀</text>
+      <text x="120" y="80" font-family="Arial, sans-serif" font-size="20" fill="#ffffff" text-anchor="middle">开机直达豆包</text>
+    </g>
+
+    <!-- 功能卡片 2: 应用锁定 -->
+    <g transform="translate(270, 0)">
+      <rect x="0" y="0" width="240" height="120" rx="12" fill="#ffffff" fill-opacity="0.1"/>
+      <text x="120" y="45" font-family="Arial, sans-serif" font-size="24" fill="#ffffff" text-anchor="middle">🔒</text>
+      <text x="120" y="80" font-family="Arial, sans-serif" font-size="20" fill="#ffffff" text-anchor="middle">应用锁定模式</text>
+    </g>
+
+    <!-- 功能卡片 3: 音量解锁 -->
+    <g transform="translate(0, 150)">
+      <rect x="0" y="0" width="240" height="120" rx="12" fill="#ffffff" fill-opacity="0.1"/>
+      <text x="120" y="45" font-family="Arial, sans-serif" font-size="24" fill="#ffffff" text-anchor="middle">🔊</text>
+      <text x="120" y="80" font-family="Arial, sans-serif" font-size="20" fill="#ffffff" text-anchor="middle">音量键解锁</text>
+    </g>
+
+    <!-- 功能卡片 4: 白名单 -->
+    <g transform="translate(270, 150)">
+      <rect x="0" y="0" width="240" height="120" rx="12" fill="#ffffff" fill-opacity="0.1"/>
+      <text x="120" y="45" font-family="Arial, sans-serif" font-size="24" fill="#ffffff" text-anchor="middle">⚙️</text>
+      <text x="120" y="80" font-family="Arial, sans-serif" font-size="20" fill="#ffffff" text-anchor="middle">自定义白名单</text>
+    </g>
+  </g>
+
+  <!-- 底部标语 -->
+  <text x="512" y="450" font-family="Arial, sans-serif" font-size="22" fill="#aaaaaa" text-anchor="middle">开机即对话 · 语音即操作 · 让 AI 成为中心</text>
+</svg>

@@ -42,6 +42,10 @@ public class MainActivity extends Activity {
         // "com.taobao.taobao",           // 淘宝
         // "com.sdu.didi.psnger",         // 滴滴
         // "com.ss.android.ugc.aweme",    // 抖音
+        "com.android.settings",
+        "com.android.chrome",
+
+
     };
     // ==============================================
 

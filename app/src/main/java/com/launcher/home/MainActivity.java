@@ -96,7 +96,7 @@ public class MainActivity extends Activity {
     }
 
     /**
-     * 启动 AI 助手（豆包）
+     * 启动 AI 助手（豆包）- 直接进入语音模式
      */
     private void launchAIAssistant() {
         // 延迟500ms启动，确保Launcher完全加载
@@ -105,10 +105,43 @@ public class MainActivity extends Activity {
             public void run() {
                 PackageManager pm = getPackageManager();
 
-                // 尝试启动豆包APP
+                // 方式1: 尝试 Deep Link 启动语音（常见的 voice scheme）
+                try {
+                    Intent voiceIntent = new Intent(Intent.ACTION_VIEW);
+                    voiceIntent.setData(android.net.Uri.parse("doubao://voice"));
+                    voiceIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(voiceIntent);
+                    return;
+                } catch (Exception e) {
+                    // Deep Link 失败，继续尝试其他方式
+                }
+
+                // 方式2: 尝试其他可能的 scheme
+                String[] schemes = {
+                    "snssdk1128://voice",      // 抖音相关
+                    "volcano://voice",          // 火山引擎
+                    "bytedance://voice",        // 字节跳动
+                };
+
+                for (String scheme : schemes) {
+                    try {
+                        Intent schemeIntent = new Intent(Intent.ACTION_VIEW);
+                        schemeIntent.setData(android.net.Uri.parse(scheme));
+                        schemeIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(schemeIntent);
+                        return;
+                    } catch (Exception e) {
+                        // 继续尝试下一个
+                    }
+                }
+
+                // 方式3: 普通启动豆包 APP
                 Intent intent = pm.getLaunchIntentForPackage(AI_ASSISTANT_PACKAGE);
                 if (intent != null) {
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    // 尝试传递语音参数
+                    intent.putExtra("enter_voice", true);
+                    intent.putExtra("auto_voice", true);
                     startActivity(intent);
                 } else {
                     // 豆包未安装，提示用户

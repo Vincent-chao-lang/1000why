@@ -35,7 +35,7 @@ public class MainActivity extends Activity {
 
     // ========== AI 助手配置 ==========
     // 豆包 APP 包名（需要在设备上确认实际包名）
-    private static final String AI_ASSISTANT_PACKAGE = "com.volcano.video";
+    private static final String AI_ASSISTANT_PACKAGE = "com.larus.nova";
     // 开机自动启动 AI 助手
     private static final boolean AUTO_LAUNCH_AI = true;
     // ===========================================

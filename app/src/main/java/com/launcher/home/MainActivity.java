@@ -41,7 +41,7 @@ public class MainActivity extends Activity {
     // 豆包 APP 包名（需要在设备上确认实际包名）
     private static final String AI_ASSISTANT_PACKAGE = "com.larus.nova";
     // 开机自动启动 AI 助手
-    private static final boolean AUTO_LAUNCH_AI = false;  // 临时关闭锁定
+    private static final boolean AUTO_LAUNCH_AI = true;  // 启用 AI 锁定
     // ===========================================
 
     // ========== 白名单配置：只显示这些应用 ==========

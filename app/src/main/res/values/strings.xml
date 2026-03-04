@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Home Launcher</string>
+    <string name="accessibility_service_description">AI 手机锁定服务 - 防止意外退出豆包应用。需要在设置中手动开启此服务。</string>
 </resources>

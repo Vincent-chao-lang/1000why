@@ -33,6 +33,10 @@ public class MainActivity extends Activity {
     private List<AppInfo> appList;
     private AppAdapter appAdapter;
 
+    // 退出锁定计数器
+    private int unlockPressCount = 0;
+    private static final int UNLOCK_PRESS_COUNT = 5;  // 连续点击5次解锁
+
     // ========== AI 助手配置 ==========
     // 豆包 APP 包名（需要在设备上确认实际包名）
     private static final String AI_ASSISTANT_PACKAGE = "com.larus.nova";
@@ -93,6 +97,44 @@ public class MainActivity extends Activity {
                 return true;
             }
         });
+
+        // 添加点击屏幕计数器用于解锁
+        appGrid.setOnTouchListener(new View.OnTouchListener() {
+            private long lastClickTime = 0;
+
+            @Override
+            public boolean onTouch(View v, android.view.MotionEvent event) {
+                if (event.getAction() == android.view.MotionEvent.ACTION_DOWN) {
+                    long currentTime = System.currentTimeMillis();
+                    // 2秒内的连续点击才计数
+                    if (currentTime - lastClickTime < 2000) {
+                        unlockPressCount++;
+                        if (unlockPressCount >= UNLOCK_PRESS_COUNT) {
+                            unlockLauncher();
+                            unlockPressCount = 0;
+                        } else {
+                            int remaining = UNLOCK_PRESS_COUNT - unlockPressCount;
+                            Toast.makeText(MainActivity.this,
+                                "再点击 " + remaining + " 次解锁",
+                                Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        unlockPressCount = 1;
+                    }
+                    lastClickTime = currentTime;
+                }
+                return false;
+            }
+        });
+    }
+
+    /**
+     * 解锁 Launcher - 暂时禁用 AI 自动启动
+     */
+    private void unlockLauncher() {
+        Toast.makeText(this, "已解锁！可以正常使用桌面了", Toast.LENGTH_LONG).show();
+        // 标记为已解锁，onResume 不会自动启动豆包
+        unlockPressCount = -999;
     }
 
     /**
@@ -319,8 +361,8 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
 
-        // 如果启用 AI 助手锁定，从任何应用返回都自动重新启动豆包
-        if (AUTO_LAUNCH_AI) {
+        // 如果启用 AI 助手锁定 且 未解锁，从任何应用返回都自动重新启动豆包
+        if (AUTO_LAUNCH_AI && unlockPressCount != -999) {
             launchAIAssistant();
             return; // 不显示 Launcher 界面
         }

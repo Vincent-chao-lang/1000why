@@ -33,6 +33,13 @@ public class MainActivity extends Activity {
     private List<AppInfo> appList;
     private AppAdapter appAdapter;
 
+    // ========== AI 助手配置 ==========
+    // 豆包 APP 包名（需要在设备上确认实际包名）
+    private static final String AI_ASSISTANT_PACKAGE = "com.volcano.video";
+    // 开机自动启动 AI 助手
+    private static final boolean AUTO_LAUNCH_AI = true;
+    // ===========================================
+
     // ========== 白名单配置：只显示这些应用 ==========
     // 留空则显示所有应用（除了自己）
     private static final String[] APP_WHITELIST = {
@@ -56,6 +63,11 @@ public class MainActivity extends Activity {
 
         initViews();
         loadApps();
+
+        // 开机自动启动 AI 助手
+        if (AUTO_LAUNCH_AI) {
+            launchAIAssistant();
+        }
     }
 
     private void initViews() {
@@ -80,6 +92,31 @@ public class MainActivity extends Activity {
                 return true;
             }
         });
+    }
+
+    /**
+     * 启动 AI 助手（豆包）
+     */
+    private void launchAIAssistant() {
+        // 延迟500ms启动，确保Launcher完全加载
+        new android.os.Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                PackageManager pm = getPackageManager();
+
+                // 尝试启动豆包APP
+                Intent intent = pm.getLaunchIntentForPackage(AI_ASSISTANT_PACKAGE);
+                if (intent != null) {
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(intent);
+                } else {
+                    // 豆包未安装，提示用户
+                    Toast.makeText(MainActivity.this,
+                        "豆包 APP 未安装，请先安装豆包",
+                        Toast.LENGTH_LONG).show();
+                }
+            }
+        }, 500);
     }
 
     /**

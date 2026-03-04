@@ -35,7 +35,12 @@ public class MainActivity extends Activity {
 
     // 退出锁定计数器
     private int unlockPressCount = 0;
-    private static final int UNLOCK_PRESS_COUNT = 5;  // 连续点击5次解锁
+    private static final int UNLOCK_PRESS_COUNT = 3;  // 连续点击3次解锁
+
+    // 音量键解锁
+    private boolean volumeUpPressed = false;
+    private boolean volumeDownPressed = false;
+    private long lastVolumePressTime = 0;
 
     // ========== AI 助手配置 ==========
     // 豆包 APP 包名（需要在设备上确认实际包名）
@@ -383,5 +388,63 @@ public class MainActivity extends Activity {
         // Home应用不应该退出，按返回键不做任何事
         // 或者可以显示最近任务
         // 这里我们什么都不做
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, android.view.KeyEvent event) {
+        // 音量键解锁：同时按音量+和音量-（或快速交替按）
+        if (keyCode == android.view.KeyEvent.KEYCODE_VOLUME_UP) {
+            volumeUpPressed = true;
+            checkVolumeUnlock();
+            return true;
+        }
+        if (keyCode == android.view.KeyEvent.KEYCODE_VOLUME_DOWN) {
+            volumeDownPressed = true;
+            checkVolumeUnlock();
+            return true;
+        }
+
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public boolean onKeyUp(int keyCode, android.view.KeyEvent event) {
+        if (keyCode == android.view.KeyEvent.KEYCODE_VOLUME_UP) {
+            volumeUpPressed = false;
+            return true;
+        }
+        if (keyCode == android.view.KeyEvent.KEYCODE_VOLUME_DOWN) {
+            volumeDownPressed = false;
+            return true;
+        }
+        return super.onKeyUp(keyCode, event);
+    }
+
+    /**
+     * 检查音量键解锁条件
+     */
+    private void checkVolumeUnlock() {
+        long currentTime = System.currentTimeMillis();
+
+        // 方式1: 同时按住音量+和音量-
+        if (volumeUpPressed && volumeDownPressed) {
+            unlockLauncher();
+            return;
+        }
+
+        // 方式2: 3秒内快速交替按音量键3次
+        if (currentTime - lastVolumePressTime < 3000) {
+            unlockPressCount++;
+            if (unlockPressCount >= UNLOCK_PRESS_COUNT) {
+                unlockLauncher();
+                unlockPressCount = 0;
+            } else {
+                int remaining = UNLOCK_PRESS_COUNT - unlockPressCount;
+                Toast.makeText(this, "再按音量键 " + remaining + " 次", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            unlockPressCount = 1;
+        }
+        lastVolumePressTime = currentTime;
     }
 }

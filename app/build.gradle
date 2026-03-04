@@ -19,6 +19,9 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
+            // 使用 debug 签名配置（测试版）
+            // 正式上架需要创建正式的 keystore
+            signingConfig signingConfigs.debug
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }

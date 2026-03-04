@@ -98,8 +98,9 @@ public class MainActivity extends Activity {
             }
         });
 
-        // 添加点击屏幕计数器用于解锁
-        appGrid.setOnTouchListener(new View.OnTouchListener() {
+        // 在根布局添加点击屏幕计数器用于解锁（监听整个屏幕）
+        View rootLayout = findViewById(R.id.root_layout);
+        rootLayout.setOnTouchListener(new View.OnTouchListener() {
             private long lastClickTime = 0;
 
             @Override
@@ -120,6 +121,9 @@ public class MainActivity extends Activity {
                         }
                     } else {
                         unlockPressCount = 1;
+                        Toast.makeText(MainActivity.this,
+                            "再点击 " + (UNLOCK_PRESS_COUNT - 1) + " 次解锁",
+                            Toast.LENGTH_SHORT).show();
                     }
                     lastClickTime = currentTime;
                 }

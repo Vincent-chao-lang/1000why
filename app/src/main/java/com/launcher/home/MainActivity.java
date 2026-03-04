@@ -51,6 +51,7 @@ public class MainActivity extends Activity {
         // "com.ss.android.ugc.aweme",    // 抖音
         "com.android.settings",
         "com.android.chrome",
+        "com.larus.nova",
 
 
     };

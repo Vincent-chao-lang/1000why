@@ -285,6 +285,13 @@ public class MainActivity extends Activity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        // 如果启用 AI 助手锁定，从任何应用返回都自动重新启动豆包
+        if (AUTO_LAUNCH_AI) {
+            launchAIAssistant();
+            return; // 不显示 Launcher 界面
+        }
+
         // 每次返回时重新加载应用列表
         if (appAdapter != null) {
             appList.clear();

@@ -207,6 +207,99 @@
             color: #667eea;
         }
 
+        .setup-guide {
+            background: rgba(102, 126, 234, 0.08);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(102, 126, 234, 0.2);
+        }
+
+        .setup-guide h2 {
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            color: #667eea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .setup-step {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .setup-step:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .setup-step h3 {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .setup-step p, .setup-step li {
+            color: #a0aec0;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .setup-step ol {
+            padding-left: 20px;
+            margin-top: 10px;
+        }
+
+        .setup-step li {
+            margin-bottom: 8px;
+        }
+
+        .highlight-box {
+            background: rgba(16, 185, 129, 0.1);
+            border-left: 3px solid #10b981;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .highlight-box p {
+            margin: 0;
+            color: #10b981 !important;
+            font-size: 0.9rem !important;
+        }
+
+        .warning-box {
+            background: rgba(245, 158, 11, 0.1);
+            border-left: 3px solid #f59e0b;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .warning-box p {
+            margin: 0;
+            color: #f59e0b !important;
+            font-size: 0.9rem !important;
+        }
+
         .links {
             text-align: center;
             display: flex;
@@ -315,6 +408,83 @@
                 <li>选择 <code>Home Launcher</code> 并设为始终使用</li>
                 <li>首次打开会自动启动豆包语音助手</li>
             </ol>
+        </section>
+
+        <section class="setup-guide">
+            <h2>⚙️ 安装后设置</h2>
+
+            <div class="setup-step">
+                <h3><span class="step-number">1</span> 设置默认启动器（开机自动启动）</h3>
+                <p>让 Home Launcher 在开机时自动启动：</p>
+                <ol>
+                    <li>按设备的 <strong>Home 键</strong> 或 <strong>最近应用键</strong></li>
+                    <li>在弹出的选择器中，选择 <code>Home Launcher</code></li>
+                    <li>点击 <strong>"始终"</strong> 或 <strong>"设为默认"</strong></li>
+                    <li>以后开机或按 Home 键都会进入 Home Launcher</li>
+                </ol>
+                <div class="highlight-box">
+                    <p>✅ 完成后，开机将自动进入 Home Launcher 并启动豆包语音助手</p>
+                </div>
+            </div>
+
+            <div class="setup-step">
+                <h3><span class="step-number">2</span> 启用无障碍服务（应用锁定功能）</h3>
+                <p>防止意外退出豆包语音助手：</p>
+                <ol>
+                    <li>打开手机 <strong>设置</strong></li>
+                    <li>找到 <strong>无障碍</strong> 或 <strong>辅助功能</strong></li>
+                    <li>向下滚动找到 <code>Home Launcher</code></li>
+                    <li>开启开关，授予无障碍权限</li>
+                </ol>
+                <div class="highlight-box">
+                    <p>✅ 启用后，在豆包应用中按返回键将无法退出，实现真正的锁定</p>
+                </div>
+            </div>
+
+            <div class="setup-step">
+                <h3><span class="step-number">3</span> 了解解锁方式</h3>
+                <p>当需要退出豆包或卸载应用时，使用以下方法解锁：</p>
+                <p><strong>方法一：音量键解锁</strong></p>
+                <ul style="padding-left: 20px; margin-top: 5px;">
+                    <li>同时按下 <strong>音量+</strong> 和 <strong>音量-</strong></li>
+                    <li>或交替按 <strong>音量+、音量-、音量+</strong> 三次</li>
+                </ul>
+                <p style="margin-top: 10px;"><strong>方法二：触摸解锁</strong></p>
+                <ul style="padding-left: 20px; margin-top: 5px;">
+                    <li>在 Home Launcher 桌面连续点击 <strong>5 次</strong></li>
+                </ul>
+                <div class="warning-box">
+                    <p>⚠️ 解锁后会提示"已解锁"，此时可以正常使用其他应用或卸载本应用</p>
+                </div>
+            </div>
+
+            <div class="setup-step">
+                <h3><span class="step-number">4</span> 自定义应用白名单（可选）</h3>
+                <p>默认显示所有已安装应用。如需只显示特定应用：</p>
+                <ol>
+                    <li>使用代码编辑器打开应用的源代码</li>
+                    <li>找到 <code>WHITELIST_PACKAGES</code> 数组</li>
+                    <li>添加或删除应用包名，例如：</li>
+                </ol>
+                <pre style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 6px; margin-top: 10px; font-size: 0.85rem; overflow-x: auto;"><code>private static final String[] WHITELIST_PACKAGES = {
+    "com.larus.nova",        // 豆包
+    "com.tencent.mm",        // 微信
+    "com.alibaba.android.rimet"  // 钉钉
+};</code></pre>
+            </div>
+
+            <div class="setup-step">
+                <h3><span class="step-number">5</span> 还原默认启动器</h3>
+                <p>如需恢复原来的桌面：</p>
+                <ol>
+                    <li>先解锁应用（见步骤3）</li>
+                    <li>打开手机 <strong>设置</strong></li>
+                    <li>找到 <strong>应用管理</strong> 或 <strong>应用</strong></li>
+                    <li>找到 <code>Home Launcher</code></li>
+                    <li>点击 <strong>清除默认设置</strong> 或 <strong>默认应用</strong></li>
+                    <li>按 Home 键重新选择原来的桌面</li>
+                </ol>
+            </div>
         </section>
 
         <section class="links">

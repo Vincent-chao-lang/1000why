@@ -34,6 +34,9 @@ jobs:
 
     - name: Generate Release Keystore
       run: |
+        # Remove old keystore if exists
+        rm -f app/release-keystore.jks
+
         STOREPASS="${{ secrets.KEYSTORE_PASSWORD }}"
         KEYPASS="${{ secrets.KEY_PASSWORD }}"
         # Use default passwords if secrets are not set
@@ -48,7 +51,8 @@ jobs:
           -validity 10000 \
           -dname "CN=Home Launcher, OU=Development, O=Vincent Chao, L=Shanghai, ST=Shanghai, C=CN" \
           -storepass "$STOREPASS" \
-          -keypass "$KEYPASS"
+          -keypass "$KEYPASS" \
+          -noprompt
 
     - name: Create keystore properties
       run: |
@@ -77,7 +81,10 @@ jobs:
         keytool -list -v -keystore app/release-keystore.jks -storepass "${{ secrets.KEYSTORE_PASSWORD }}" || keytool -list -v -keystore app/release-keystore.jks -storepass "changeme"
 
     - name: Build Release APK
-      run: gradle assembleRelease --no-daemon
+      run: |
+        echo "Starting Release build..."
+        gradle assembleRelease --no-daemon --stacktrace --info 2>&1 | tee build.log
+        echo "Build finished with exit code: $?"
 
     - name: Sign APK (optional - debug only)
       run: |

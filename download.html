@@ -318,6 +318,116 @@
             color: #667eea;
         }
 
+        .feedback-section {
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 16px;
+            padding: 35px;
+            margin-bottom: 40px;
+            border: 1px solid rgba(102, 126, 234, 0.15);
+        }
+
+        .feedback-section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #667eea;
+            text-align: center;
+        }
+
+        .feedback-section p.subtitle {
+            text-align: center;
+            color: #a0aec0;
+            margin-bottom: 25px;
+            font-size: 0.95rem;
+        }
+
+        .feedback-form {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #e2e8f0;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 1rem;
+            font-family: inherit;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-group select {
+            cursor: pointer;
+        }
+
+        .form-group select option {
+            background: #1a1a2e;
+            color: #ffffff;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .form-note {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 0.85rem;
+            color: #718096;
+        }
+
         footer {
             text-align: center;
             margin-top: 60px;
@@ -466,6 +576,48 @@
                     <li>按 Home 键重新选择原来的桌面</li>
                 </ol>
             </div>
+        </section>
+
+        <section class="feedback-section">
+            <h2>💬 问题反馈</h2>
+            <p class="subtitle">遇到问题或有建议？欢迎留言反馈</p>
+
+            <form class="feedback-form" action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+                <div class="form-group">
+                    <label for="name">您的称呼 *</label>
+                    <input type="text" id="name" name="name" required placeholder="请输入您的称呼">
+                </div>
+
+                <div class="form-group">
+                    <label for="email">联系邮箱</label>
+                    <input type="email" id="email" name="email" placeholder="可选，用于接收回复">
+                </div>
+
+                <div class="form-group">
+                    <label for="type">反馈类型 *</label>
+                    <select id="type" name="type" required>
+                        <option value="">请选择反馈类型</option>
+                        <option value="bug">🐛 问题报告</option>
+                        <option value="feature">💡 功能建议</option>
+                        <option value="question">❓ 使用咨询</option>
+                        <option value="other">📝 其他</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="device">设备型号</label>
+                    <input type="text" id="device" name="device" placeholder="例如：小米14、华为Mate60">
+                </div>
+
+                <div class="form-group">
+                    <label for="message">详细描述 *</label>
+                    <textarea id="message" name="message" required placeholder="请详细描述您遇到的问题或建议..."></textarea>
+                </div>
+
+                <button type="submit" class="submit-btn">提交反馈</button>
+
+                <p class="form-note">✉️ 反馈将直接发送到开发者邮箱，我们会尽快回复</p>
+            </form>
         </section>
 
         <footer>

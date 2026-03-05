@@ -91,3 +91,6 @@ lint-results*.html
 
 # Android Profiling
 *.hprof
+
+# Download page (contains Formspree configuration)
+download.html

@@ -1,4 +1,4 @@
-name: Build Android APK
+name: Build Android APK and Bundle
 
 on:
   push:
@@ -86,10 +86,19 @@ jobs:
         gradle assembleRelease --no-daemon --stacktrace --info 2>&1 | tee build.log
         echo "Build finished with exit code: $?"
 
-    - name: Sign APK (optional - debug only)
+    - name: Build Release Bundle (AAB for Google Play)
       run: |
-        echo "APK built successfully"
-        ls -lh app/build/outputs/apk/
+        echo "Starting Release Bundle build..."
+        gradle bundleRelease --no-daemon --stacktrace --info 2>&1 | tee bundle.log
+        echo "Bundle build finished with exit code: $?"
+
+    - name: List build outputs
+      run: |
+        echo "=== APK Files ==="
+        ls -lh app/build/outputs/apk/ || true
+        echo ""
+        echo "=== Bundle Files (AAB) ==="
+        ls -lh app/build/outputs/bundle/ || true
 
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4
@@ -105,13 +114,21 @@ jobs:
         path: app/build/outputs/apk/release/app-release.apk
         retention-days: 30
 
-    - name: Release APK (on push to main)
+    - name: Upload Release Bundle (AAB)
+      uses: actions/upload-artifact@v4
+      with:
+        name: app-release-bundle
+        path: app/build/outputs/bundle/release/app-release.aab
+        retention-days: 30
+
+    - name: Release APK and Bundle (on push to main)
       if: github.event_name == 'push' && github.ref == 'refs/heads/main'
       uses: softprops/action-gh-release@v1
       with:
         files: |
           app/build/outputs/apk/debug/app-debug.apk
           app/build/outputs/apk/release/app-release.apk
+          app/build/outputs/bundle/release/app-release.aab
         tag_name: v${{ github.run_number }}
         name: Release Build ${{ github.run_number }}
       env:

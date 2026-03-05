@@ -1,19 +1,18 @@
 #!/bin/bash
 
 # SVG 转 PNG 图标转换脚本
-# 需要安装 ImageMagick: brew install imagemagick (macOS)
+# 需要安装 librsvg: brew install librsvg (macOS)
 
 echo "Home Launcher - 图标转换脚本"
 echo "================================"
 
-# 检查 ImageMagick 是否安装
-if ! command -v convert &> /dev/null; then
-    echo "❌ 错误: 未找到 ImageMagick"
+# 检查 rsvg-convert 是否安装
+if ! command -v rsvg-convert &> /dev/null; then
+    echo "❌ 错误: 未找到 rsvg-convert"
     echo ""
-    echo "请先安装 ImageMagick:"
-    echo "  macOS: brew install imagemagick"
-    echo "  Ubuntu: sudo apt-get install imagemagick"
-    echo "  Windows: https://imagemagick.org/script/download.php"
+    echo "请先安装 librsvg:"
+    echo "  macOS: brew install librsvg"
+    echo "  Ubuntu: sudo apt-get install librsvg2-bin"
     exit 1
 fi
 
@@ -32,7 +31,7 @@ echo ""
 for size in "${SIZES[@]}"
 do
     echo "  生成 ${size}x${size} 图标..."
-    convert assets/icon_launcher.svg -resize ${size}x${size} icons_output/ic_launcher_${size}.png
+    rsvg-convert -w ${size} -h ${size} assets/icon_launcher.svg -o icons_output/ic_launcher_${size}.png
 
     # 同时生成 round 版本
     cp icons_output/ic_launcher_${size}.png icons_output/ic_launcher_round_${size}.png
@@ -44,13 +43,13 @@ echo ""
 
 # 生成自适应图标
 echo "🎨 生成自适应图标..."
-convert assets/icon_launcher.svg -resize 108x108 icons_output/ic_launcher_foreground.png
+rsvg-convert -w 108 -h 108 assets/icon_launcher.svg -o icons_output/ic_launcher_foreground.png
 echo "  ✓ ic_launcher_foreground.png (108x108)"
 echo ""
 
 # 生成宣传图
 echo "🎨 生成宣传图..."
-convert assets/feature_graphic.svg -resize 1024x500 icons_output/feature_graphic.png
+rsvg-convert -w 1024 -h 500 assets/feature_graphic.svg -o icons_output/feature_graphic.png
 echo "  ✓ feature_graphic.png (1024x500)"
 echo ""
 

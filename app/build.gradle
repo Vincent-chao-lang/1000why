@@ -23,13 +23,14 @@ android {
 
     signingConfigs {
         release {
-            if (keystoreProperties['RELEASE_KEYSTORE_FILE']) {
+            // 检查是否配置了正式签名
+            if (keystorePropertiesFile.exists() && keystoreProperties['RELEASE_KEYSTORE_FILE']) {
                 storeFile file(keystoreProperties['RELEASE_KEYSTORE_FILE'])
                 storePassword keystoreProperties['RELEASE_KEYSTORE_PASSWORD']
                 keyAlias keystoreProperties['RELEASE_KEY_ALIAS']
                 keyPassword keystoreProperties['RELEASE_KEY_PASSWORD']
             } else {
-                // 未配置正式签名时使用 debug 签名
+                // 未配置时使用 debug 签名（仅用于开发测试）
                 storeFile file('debug.keystore')
                 storePassword 'android'
                 keyAlias 'androiddebugkey'
@@ -43,7 +44,6 @@ android {
             signingConfig signingConfigs.debug
         }
         release {
-            // 优先使用正式签名配置
             signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'

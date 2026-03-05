@@ -65,6 +65,17 @@ jobs:
         echo "RELEASE_KEY_ALIAS=$KEYALIAS" >> app/keystore.properties
         echo "RELEASE_KEY_PASSWORD=$KEYPASS" >> app/keystore.properties
 
+    - name: Verify keystore setup
+      run: |
+        echo "=== Keystore file ==="
+        ls -la app/release-keystore.jks || echo "Keystore not found"
+        echo ""
+        echo "=== Keystore properties ==="
+        cat app/keystore.properties
+        echo ""
+        echo "=== Testing keystore ==="
+        keytool -list -v -keystore app/release-keystore.jks -storepass "${{ secrets.KEYSTORE_PASSWORD }}" || keytool -list -v -keystore app/release-keystore.jks -storepass "changeme"
+
     - name: Build Release APK
       run: gradle assembleRelease --no-daemon
 

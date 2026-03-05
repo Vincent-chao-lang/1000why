@@ -34,6 +34,12 @@ jobs:
 
     - name: Generate Release Keystore
       run: |
+        STOREPASS="${{ secrets.KEYSTORE_PASSWORD }}"
+        KEYPASS="${{ secrets.KEY_PASSWORD }}"
+        # Use default passwords if secrets are not set
+        STOREPASS="${STOREPASS:-changeme}"
+        KEYPASS="${KEYPASS:-changeme}"
+
         keytool -genkeypair \
           -keystore app/release-keystore.jks \
           -alias release \
@@ -41,15 +47,23 @@ jobs:
           -keysize 2048 \
           -validity 10000 \
           -dname "CN=Home Launcher, OU=Development, O=Vincent Chao, L=Shanghai, ST=Shanghai, C=CN" \
-          -storepass "${{ secrets.KEYSTORE_PASSWORD != '' && secrets.KEYSTORE_PASSWORD || 'changeme' }}" \
-          -keypass "${{ secrets.KEY_PASSWORD != '' && secrets.KEY_PASSWORD || 'changeme' }}"
+          -storepass "$STOREPASS" \
+          -keypass "$KEYPASS"
 
     - name: Create keystore properties
       run: |
+        STOREPASS="${{ secrets.KEYSTORE_PASSWORD }}"
+        KEYPASS="${{ secrets.KEY_PASSWORD }}"
+        KEYALIAS="${{ secrets.KEY_ALIAS }}"
+        # Use default values if secrets are not set
+        STOREPASS="${STOREPASS:-changeme}"
+        KEYPASS="${KEYPASS:-changeme}"
+        KEYALIAS="${KEYALIAS:-release}"
+
         echo "RELEASE_KEYSTORE_FILE=release-keystore.jks" > app/keystore.properties
-        echo "RELEASE_KEYSTORE_PASSWORD=${{ secrets.KEYSTORE_PASSWORD != '' && secrets.KEYSTORE_PASSWORD || 'changeme' }}" >> app/keystore.properties
-        echo "RELEASE_KEY_ALIAS=${{ secrets.KEY_ALIAS != '' && secrets.KEY_ALIAS || 'release' }}" >> app/keystore.properties
-        echo "RELEASE_KEY_PASSWORD=${{ secrets.KEY_PASSWORD != '' && secrets.KEY_PASSWORD || 'changeme' }}" >> app/keystore.properties
+        echo "RELEASE_KEYSTORE_PASSWORD=$STOREPASS" >> app/keystore.properties
+        echo "RELEASE_KEY_ALIAS=$KEYALIAS" >> app/keystore.properties
+        echo "RELEASE_KEY_PASSWORD=$KEYPASS" >> app/keystore.properties
 
     - name: Build Release APK
       run: gradle assembleRelease --no-daemon

@@ -94,3 +94,6 @@ lint-results*.html
 
 # Download page (contains Formspree configuration)
 download.html
+
+# Documentation (temporarily not committing)
+docs/

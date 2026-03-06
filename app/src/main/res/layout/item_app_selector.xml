@@ -46,4 +46,15 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="12dp"/>
 
+    <!-- 默认启动按钮 -->
+    <ImageButton
+        android:id="@+id/default_launch_button"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="8dp"
+        android:background="@android:color/transparent"
+        android:src="@android:drawable/star_off"
+        android:scaleType="center"
+        android:contentDescription="设为默认启动"/>
+
 </LinearLayout>

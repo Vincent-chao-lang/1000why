@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -19,9 +20,15 @@ import java.util.List;
 public class AppSelectorAdapter extends RecyclerView.Adapter<AppSelectorAdapter.ViewHolder> {
 
     private List<WhitelistSettingsActivity.AppSelectorItem> items;
+    private OnDefaultLaunchChangeListener listener;
 
-    public AppSelectorAdapter(List<WhitelistSettingsActivity.AppSelectorItem> items) {
+    public interface OnDefaultLaunchChangeListener {
+        void onDefaultLaunchChange(String packageName);
+    }
+
+    public AppSelectorAdapter(List<WhitelistSettingsActivity.AppSelectorItem> items, OnDefaultLaunchChangeListener listener) {
         this.items = items;
+        this.listener = listener;
     }
 
     @NonNull
@@ -41,6 +48,9 @@ public class AppSelectorAdapter extends RecyclerView.Adapter<AppSelectorAdapter.
         holder.packageText.setText(item.getPackageName());
         holder.checkbox.setChecked(item.isChecked());
 
+        // 设置默认启动按钮图标
+        updateDefaultLaunchButton(holder.defaultLaunchButton, item.isDefaultLaunch());
+
         // 设置复选框监听器
         holder.checkbox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -49,7 +59,17 @@ public class AppSelectorAdapter extends RecyclerView.Adapter<AppSelectorAdapter.
             }
         });
 
-        // 整个 item 点击时切换复选框状态
+        // 默认启动按钮点击事件
+        holder.defaultLaunchButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (listener != null) {
+                    listener.onDefaultLaunchChange(item.getPackageName());
+                }
+            }
+        });
+
+        // 整个 item 点击时切换复选框状态（不包含按钮区域）
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -58,6 +78,16 @@ public class AppSelectorAdapter extends RecyclerView.Adapter<AppSelectorAdapter.
                 holder.checkbox.setChecked(newState);
             }
         });
+    }
+
+    private void updateDefaultLaunchButton(ImageButton button, boolean isDefault) {
+        if (isDefault) {
+            button.setImageDrawable(button.getResources().getDrawable(
+                    android.R.drawable.star_on));
+        } else {
+            button.setImageDrawable(button.getResources().getDrawable(
+                    android.R.drawable.star_off));
+        }
     }
 
     @Override
@@ -70,6 +100,7 @@ public class AppSelectorAdapter extends RecyclerView.Adapter<AppSelectorAdapter.
         TextView nameText;
         TextView packageText;
         CheckBox checkbox;
+        ImageButton defaultLaunchButton;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -77,6 +108,7 @@ public class AppSelectorAdapter extends RecyclerView.Adapter<AppSelectorAdapter.
             nameText = itemView.findViewById(R.id.app_name);
             packageText = itemView.findViewById(R.id.app_package);
             checkbox = itemView.findViewById(R.id.app_checkbox);
+            defaultLaunchButton = itemView.findViewById(R.id.default_launch_button);
         }
     }
 }

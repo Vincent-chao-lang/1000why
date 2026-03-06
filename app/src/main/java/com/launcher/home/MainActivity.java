@@ -64,8 +64,9 @@ public class MainActivity extends Activity {
         initViews();
         loadApps();
 
-        // 开机自动启动 AI 助手
-        if (AUTO_LAUNCH_AI) {
+        // 如果首次使用，不自动启动 AI，让用户先设置
+        // 如果已完成设置，则自动启动用户选择的默认应用
+        if (!whitelistManager.isFirstTimeSetup() && AUTO_LAUNCH_AI) {
             launchAIAssistant();
         }
     }
@@ -146,56 +147,70 @@ public class MainActivity extends Activity {
     }
 
     /**
-     * 启动 AI 助手（豆包）- 直接进入语音模式
+     * 启动 AI 助手（用户设置的默认应用）- 直接进入语音模式
      */
     private void launchAIAssistant() {
+        // 获取用户设置的默认启动应用
+        final String targetPackage = whitelistManager.getDefaultLaunchApp();
+
         // 延迟500ms启动，确保Launcher完全加载
         new android.os.Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 PackageManager pm = getPackageManager();
 
-                // 方式1: 尝试 Deep Link 启动语音（常见的 voice scheme）
-                try {
-                    Intent voiceIntent = new Intent(Intent.ACTION_VIEW);
-                    voiceIntent.setData(android.net.Uri.parse("doubao://voice"));
-                    voiceIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(voiceIntent);
-                    return;
-                } catch (Exception e) {
-                    // Deep Link 失败，继续尝试其他方式
-                }
-
-                // 方式2: 尝试其他可能的 scheme
-                String[] schemes = {
-                    "snssdk1128://voice",      // 抖音相关
-                    "volcano://voice",          // 火山引擎
-                    "bytedance://voice",        // 字节跳动
-                };
-
-                for (String scheme : schemes) {
+                // 如果是豆包，尝试使用 Deep Link 启动语音
+                if (targetPackage.equals("com.larus.nova")) {
+                    // 方式1: 尝试 Deep Link 启动语音（常见的 voice scheme）
                     try {
-                        Intent schemeIntent = new Intent(Intent.ACTION_VIEW);
-                        schemeIntent.setData(android.net.Uri.parse(scheme));
-                        schemeIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(schemeIntent);
+                        Intent voiceIntent = new Intent(Intent.ACTION_VIEW);
+                        voiceIntent.setData(android.net.Uri.parse("doubao://voice"));
+                        voiceIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(voiceIntent);
                         return;
                     } catch (Exception e) {
-                        // 继续尝试下一个
+                        // Deep Link 失败，继续尝试其他方式
+                    }
+
+                    // 方式2: 尝试其他可能的 scheme
+                    String[] schemes = {
+                        "snssdk1128://voice",      // 抖音相关
+                        "volcano://voice",          // 火山引擎
+                        "bytedance://voice",        // 字节跳动
+                    };
+
+                    for (String scheme : schemes) {
+                        try {
+                            Intent schemeIntent = new Intent(Intent.ACTION_VIEW);
+                            schemeIntent.setData(android.net.Uri.parse(scheme));
+                            schemeIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(schemeIntent);
+                            return;
+                        } catch (Exception e) {
+                            // 继续尝试下一个
+                        }
                     }
                 }
 
-                // 方式3: 普通启动豆包 APP
-                Intent intent = pm.getLaunchIntentForPackage(AI_ASSISTANT_PACKAGE);
+                // 方式3: 普通启动目标应用
+                Intent intent = pm.getLaunchIntentForPackage(targetPackage);
                 if (intent != null) {
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    // 尝试传递语音参数
-                    intent.putExtra("enter_voice", true);
-                    intent.putExtra("auto_voice", true);
+                    // 如果是豆包，尝试传递语音参数
+                    if (targetPackage.equals("com.larus.nova")) {
+                        intent.putExtra("enter_voice", true);
+                        intent.putExtra("auto_voice", true);
+                    }
                     startActivity(intent);
                 } else {
-                    // 豆包未安装，提示用户
+                    // 应用未安装，提示用户
                     Toast.makeText(MainActivity.this,
+                            "默认启动应用未安装，请先安装或重新设置",
+                            Toast.LENGTH_LONG).show();
+                }
+            }
+        }, 500);
+    }
                         "豆包 APP 未安装，请先安装豆包",
                         Toast.LENGTH_LONG).show();
                 }
@@ -374,8 +389,9 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
 
-        // 如果启用 AI 助手锁定 且 未解锁，从任何应用返回都自动重新启动豆包
-        if (AUTO_LAUNCH_AI && unlockPressCount != -999) {
+        // 如果首次使用，不自动启动应用，让用户先设置
+        // 如果已完成设置 且 未解锁，从任何应用返回都自动重新启动默认应用
+        if (!whitelistManager.isFirstTimeSetup() && AUTO_LAUNCH_AI && unlockPressCount != -999) {
             launchAIAssistant();
             return; // 不显示 Launcher 界面
         }

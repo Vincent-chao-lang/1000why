@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,6 +29,7 @@ public class WhitelistSettingsActivity extends AppCompatActivity {
     private AppSelectorAdapter adapter;
     private List<AppSelectorItem> appList;
     private WhitelistManager whitelistManager;
+    private String defaultLaunchApp; // 当前选择的默认启动应用
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,9 +37,11 @@ public class WhitelistSettingsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_whitelist_settings);
 
         whitelistManager = new WhitelistManager(this);
+        defaultLaunchApp = whitelistManager.getDefaultLaunchApp();
 
         initViews();
         loadApps();
+        updateDefaultLaunchHint();
     }
 
     private void initViews() {
@@ -46,7 +50,12 @@ public class WhitelistSettingsActivity extends AppCompatActivity {
 
         // 设置 RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new AppSelectorAdapter(appList);
+        adapter = new AppSelectorAdapter(appList, new AppSelectorAdapter.OnDefaultLaunchChangeListener() {
+            @Override
+            public void onDefaultLaunchChange(String packageName) {
+                setDefaultLaunchApp(packageName);
+            }
+        });
         recyclerView.setAdapter(adapter);
 
         // 返回按钮
@@ -87,6 +96,39 @@ public class WhitelistSettingsActivity extends AppCompatActivity {
     }
 
     /**
+     * 设置默认启动应用
+     */
+    private void setDefaultLaunchApp(String packageName) {
+        defaultLaunchApp = packageName;
+
+        // 更新所有应用的默认启动状态
+        for (AppSelectorItem item : appList) {
+            item.setDefaultLaunch(item.getPackageName().equals(packageName));
+        }
+
+        adapter.notifyDataSetChanged();
+        updateDefaultLaunchHint();
+    }
+
+    /**
+     * 更新默认启动应用提示
+     */
+    private void updateDefaultLaunchHint() {
+        TextView hintView = findViewById(R.id.default_launch_hint);
+        if (hintView != null) {
+            // 找到默认启动应用的名称
+            String appName = "未设置";
+            for (AppSelectorItem item : appList) {
+                if (item.getPackageName().equals(defaultLaunchApp)) {
+                    appName = item.getAppName();
+                    break;
+                }
+            }
+            hintView.setText("当前默认启动: " + appName);
+        }
+    }
+
+    /**
      * 加载所有已安装的应用
      */
     private void loadApps() {
@@ -110,6 +152,7 @@ public class WhitelistSettingsActivity extends AppCompatActivity {
             item.setAppName(resolveInfo.loadLabel(pm).toString());
             item.setIcon(resolveInfo.activityInfo.loadIcon(pm));
             item.setChecked(currentWhitelist.contains(packageName));
+            item.setDefaultLaunch(packageName.equals(defaultLaunchApp));
 
             appList.add(item);
         }
@@ -139,10 +182,24 @@ public class WhitelistSettingsActivity extends AppCompatActivity {
 
         whitelistManager.saveWhitelist(whitelist);
 
+        // 保存默认启动应用
+        whitelistManager.setDefaultLaunchApp(defaultLaunchApp);
+
         // 如果白名单不为空，启用白名单功能
         whitelistManager.setWhitelistEnabled(!whitelist.isEmpty());
 
-        Toast.makeText(this, "已保存 " + whitelist.size() + " 个应用", Toast.LENGTH_SHORT).show();
+        // 标记首次设置已完成
+        whitelistManager.setFirstTimeSetupCompleted();
+
+        String defaultAppName = "未设置";
+        for (AppSelectorItem item : appList) {
+            if (item.getPackageName().equals(defaultLaunchApp)) {
+                defaultAppName = item.getAppName();
+                break;
+            }
+        }
+
+        Toast.makeText(this, "已保存 " + whitelist.size() + " 个应用\n默认启动: " + defaultAppName, Toast.LENGTH_SHORT).show();
 
         // 返回主界面
         finish();
@@ -176,6 +233,7 @@ public class WhitelistSettingsActivity extends AppCompatActivity {
         private String appName;
         private android.graphics.drawable.Drawable icon;
         private boolean checked;
+        private boolean defaultLaunch; // 是否是默认启动应用
 
         public String getPackageName() {
             return packageName;
@@ -207,6 +265,14 @@ public class WhitelistSettingsActivity extends AppCompatActivity {
 
         public void setChecked(boolean checked) {
             this.checked = checked;
+        }
+
+        public boolean isDefaultLaunch() {
+            return defaultLaunch;
+        }
+
+        public void setDefaultLaunch(boolean defaultLaunch) {
+            this.defaultLaunch = defaultLaunch;
         }
     }
 }

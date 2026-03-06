@@ -16,6 +16,8 @@ public class WhitelistManager {
     private static final String PREFS_NAME = "whitelist_prefs";
     private static final String KEY_WHITELIST = "whitelist_apps";
     private static final String KEY_WHITELIST_ENABLED = "whitelist_enabled";
+    private static final String KEY_FIRST_TIME_SETUP = "first_time_setup";
+    private static final String KEY_DEFAULT_LAUNCH_APP = "default_launch_app";
 
     private final SharedPreferences prefs;
     private final Context context;
@@ -107,6 +109,41 @@ public class WhitelistManager {
      */
     public void clearWhitelist() {
         saveWhitelist(new HashSet<>());
+    }
+
+    /**
+     * 检查是否是首次使用（还未完成设置）
+     */
+    public boolean isFirstTimeSetup() {
+        return !prefs.getBoolean(KEY_FIRST_TIME_SETUP, false);
+    }
+
+    /**
+     * 标记首次设置已完成
+     */
+    public void setFirstTimeSetupCompleted() {
+        prefs.edit().putBoolean(KEY_FIRST_TIME_SETUP, true).apply();
+    }
+
+    /**
+     * 获取默认启动应用的包名
+     */
+    public String getDefaultLaunchApp() {
+        return prefs.getString(KEY_DEFAULT_LAUNCH_APP, getDefaultLaunchAppFallback());
+    }
+
+    /**
+     * 设置默认启动应用的包名
+     */
+    public void setDefaultLaunchApp(String packageName) {
+        prefs.edit().putString(KEY_DEFAULT_LAUNCH_APP, packageName).apply();
+    }
+
+    /**
+     * 获取默认启动应用的回退值（如果用户没有设置）
+     */
+    private String getDefaultLaunchAppFallback() {
+        return "com.larus.nova"; // 默认豆包
     }
 
     /**

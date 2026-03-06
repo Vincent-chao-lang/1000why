@@ -44,6 +44,9 @@ public class WhitelistSettingsActivity extends AppCompatActivity {
         whitelistManager = new WhitelistManager(this);
         defaultLaunchApp = whitelistManager.getDefaultLaunchApp();
 
+        // 同步无障碍服务的状态
+        AccessibilityLockService.autoLaunchEnabled = whitelistManager.isAutoLaunchEnabled();
+
         initViews();
         loadApps();
         updateDefaultLaunchHint();
@@ -79,6 +82,8 @@ public class WhitelistSettingsActivity extends AppCompatActivity {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 whitelistManager.setAutoLaunchEnabled(isChecked);
+                // 同步更新无障碍服务的状态
+                AccessibilityLockService.autoLaunchEnabled = isChecked;
                 String status = isChecked ? "已启用自动启动" : "已关闭自动启动";
                 Toast.makeText(WhitelistSettingsActivity.this, status, Toast.LENGTH_SHORT).show();
             }

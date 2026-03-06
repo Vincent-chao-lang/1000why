@@ -56,6 +56,9 @@ public class MainActivity extends Activity {
         // 初始化白名单管理器
         whitelistManager = new WhitelistManager(this);
 
+        // 同步无障碍服务的状态
+        AccessibilityLockService.autoLaunchEnabled = whitelistManager.isAutoLaunchEnabled();
+
         initViews();
         loadApps();
 
@@ -198,8 +201,11 @@ public class MainActivity extends Activity {
         boolean newState = !whitelistManager.isAutoLaunchEnabled();
         whitelistManager.setAutoLaunchEnabled(newState);
 
+        // 同步更新无障碍服务的状态
+        AccessibilityLockService.autoLaunchEnabled = newState;
+
         if (newState) {
-            Toast.makeText(this, "已启用自动启动", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "已启用自动启动，返回键将被拦截", Toast.LENGTH_LONG).show();
         } else {
             Toast.makeText(this, "已关闭自动启动，可以正常使用桌面", Toast.LENGTH_LONG).show();
         }

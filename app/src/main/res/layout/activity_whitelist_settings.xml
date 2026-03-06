@@ -19,10 +19,10 @@
             android:id="@+id/back_button"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
+            android:background="@android:color/transparent"
             android:src="@android:drawable/ic_menu_revert"
             android:contentDescription="返回"
-            android:tint="#FFFFFF"/>
+            android:scaleType="center"/>
 
         <!-- 标题 -->
         <TextView
@@ -39,13 +39,12 @@
         <Button
             android:id="@+id/save_button"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:text="保存"
             android:textColor="#FFFFFF"
             android:background="@color/button_background"
             android:paddingLeft="20dp"
-            android:paddingRight="20dp"
-            android:minHeight="40dp"/>
+            android:paddingRight="20dp"/>
     </LinearLayout>
 
     <!-- 提示信息 -->
@@ -77,7 +76,7 @@
         <Button
             android:id="@+id/select_all_button"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_weight="1"
             android:layout_marginEnd="8dp"
             android:text="全选"
@@ -87,7 +86,7 @@
         <Button
             android:id="@+id/select_none_button"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="48dp"
             android:layout_weight="1"
             android:layout_marginStart="8dp"
             android:text="清空"

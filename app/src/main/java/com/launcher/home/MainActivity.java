@@ -149,39 +149,6 @@ public class MainActivity extends Activity {
                 return false;
             }
         });
-
-        // 在根布局添加点击屏幕计数器用于解锁（监听整个屏幕）
-        View rootLayout = findViewById(R.id.root_layout);
-        rootLayout.setOnTouchListener(new View.OnTouchListener() {
-            private long lastClickTime = 0;
-
-            @Override
-            public boolean onTouch(View v, android.view.MotionEvent event) {
-                if (event.getAction() == android.view.MotionEvent.ACTION_DOWN) {
-                    long currentTime = System.currentTimeMillis();
-                    // 2秒内的连续点击才计数
-                    if (currentTime - lastClickTime < 2000) {
-                        unlockPressCount++;
-                        if (unlockPressCount >= UNLOCK_PRESS_COUNT) {
-                            unlockLauncher();
-                            unlockPressCount = 0;
-                        } else {
-                            int remaining = UNLOCK_PRESS_COUNT - unlockPressCount;
-                            Toast.makeText(MainActivity.this,
-                                "再点击 " + remaining + " 次解锁",
-                                Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        unlockPressCount = 1;
-                        Toast.makeText(MainActivity.this,
-                            "再点击 " + (UNLOCK_PRESS_COUNT - 1) + " 次解锁",
-                            Toast.LENGTH_SHORT).show();
-                    }
-                    lastClickTime = currentTime;
-                }
-                return false;
-            }
-        });
     }
 
     /**

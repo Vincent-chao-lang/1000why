@@ -5,6 +5,7 @@ import android.content.pm.ResolveInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -71,12 +72,11 @@ public class WhitelistSettingsActivity extends AppCompatActivity {
         // 自动启动开关
         ToggleButton autoLaunchToggle = findViewById(R.id.auto_launch_toggle);
         autoLaunchToggle.setChecked(whitelistManager.isAutoLaunchEnabled());
-        autoLaunchToggle.setOnClickListener(new View.OnClickListener() {
+        autoLaunchToggle.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onClick(View v) {
-                ToggleButton toggle = (ToggleButton) v;
-                whitelistManager.setAutoLaunchEnabled(toggle.isChecked());
-                String status = toggle.isChecked() ? "已启用自动启动" : "已关闭自动启动";
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                whitelistManager.setAutoLaunchEnabled(isChecked);
+                String status = isChecked ? "已启用自动启动" : "已关闭自动启动";
                 Toast.makeText(WhitelistSettingsActivity.this, status, Toast.LENGTH_SHORT).show();
             }
         });

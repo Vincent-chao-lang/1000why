@@ -143,7 +143,7 @@ public class WhitelistSettingsActivity extends AppCompatActivity {
             // 打开无障碍服务设置页面
             android.content.Intent intent = new android.content.Intent(android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS);
             startActivity(intent);
-            Toast.makeText(this, "请在设置中启用"AI手机助手"无障碍服务", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "请在设置中启用\"AI手机助手\"无障碍服务", Toast.LENGTH_LONG).show();
         } catch (Exception e) {
             Toast.makeText(this, "无法打开设置页面，请手动前往：设置 → 辅助功能 → 无障碍", Toast.LENGTH_LONG).show();
         }

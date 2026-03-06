@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -95,11 +94,59 @@ public class MainActivity extends Activity {
         });
 
         // 设置按钮 - 打开白名单设置
-        ImageButton settingsButton = findViewById(R.id.settings_button);
+        final TextView settingsButton = findViewById(R.id.settings_button);
         settingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 openWhitelistSettings();
+            }
+        });
+
+        // 在根布局添加点击屏幕计数器用于解锁（监听整个屏幕）
+        View rootLayout = findViewById(R.id.root_layout);
+        rootLayout.setOnTouchListener(new View.OnTouchListener() {
+            private long lastClickTime = 0;
+
+            @Override
+            public boolean onTouch(View v, android.view.MotionEvent event) {
+                if (event.getAction() == android.view.MotionEvent.ACTION_DOWN) {
+                    // 检查触摸点是否在设置按钮区域内
+                    int[] location = new int[2];
+                    settingsButton.getLocationOnScreen(location);
+                    float x = event.getRawX();
+                    float y = event.getRawY();
+
+                    boolean isInSettingsButton = x >= location[0] && x <= location[0] + settingsButton.getWidth()
+                            && y >= location[1] && y <= location[1] + settingsButton.getHeight();
+
+                    if (isInSettingsButton) {
+                        // 点击在设置按钮上，让按钮处理事件
+                        return false;
+                    }
+
+                    // 点击在其他区域，处理解锁逻辑
+                    long currentTime = System.currentTimeMillis();
+                    // 2秒内的连续点击才计数
+                    if (currentTime - lastClickTime < 2000) {
+                        unlockPressCount++;
+                        if (unlockPressCount >= UNLOCK_PRESS_COUNT) {
+                            unlockLauncher();
+                            unlockPressCount = 0;
+                        } else {
+                            int remaining = UNLOCK_PRESS_COUNT - unlockPressCount;
+                            Toast.makeText(MainActivity.this,
+                                "再点击 " + remaining + " 次解锁",
+                                Toast.LENGTH_SHORT).show();
+                        }
+                    } else {
+                        unlockPressCount = 1;
+                        Toast.makeText(MainActivity.this,
+                            "再点击 " + (UNLOCK_PRESS_COUNT - 1) + " 次解锁",
+                            Toast.LENGTH_SHORT).show();
+                    }
+                    lastClickTime = currentTime;
+                }
+                return false;
             }
         });
 

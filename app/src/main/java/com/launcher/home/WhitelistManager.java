@@ -27,9 +27,31 @@ public class WhitelistManager {
 
     /**
      * 获取白名单应用列表
+     * 首次使用时自动初始化默认白名单
      */
     public Set<String> getWhitelist() {
-        return prefs.getStringSet(KEY_WHITELIST, new HashSet<>());
+        Set<String> whitelist = prefs.getStringSet(KEY_WHITELIST, null);
+
+        // 首次使用，初始化默认白名单
+        if (whitelist == null || whitelist.isEmpty()) {
+            // 检查是否已经初始化过
+            boolean initialized = prefs.getBoolean(KEY_WHITELIST + "_init", false);
+            if (!initialized) {
+                // 首次使用，设置默认白名单
+                Set<String> defaultList = new HashSet<>();
+                for (String pkg : getDefaultWhitelist()) {
+                    defaultList.add(pkg);
+                }
+                saveWhitelist(defaultList);
+
+                // 标记为已初始化，但默认不启用白名单（显示所有应用）
+                prefs.edit().putBoolean(KEY_WHITELIST + "_init", true).apply();
+
+                return defaultList;
+            }
+        }
+
+        return whitelist != null ? whitelist : new HashSet<>();
     }
 
     /**

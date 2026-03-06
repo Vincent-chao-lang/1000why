@@ -97,6 +97,15 @@ public class WhitelistSettingsActivity extends AppCompatActivity {
         List<ResolveInfo> resolveInfos = pm.queryIntentActivities(intent, 0);
         Set<String> currentWhitelist = whitelistManager.getWhitelist();
 
+        // 如果白名单为空（首次使用），使用默认白名单来预勾选应用
+        Set<String> displayWhitelist = currentWhitelist;
+        if (displayWhitelist.isEmpty()) {
+            displayWhitelist = new HashSet<>();
+            for (String pkg : WhitelistManager.getDefaultWhitelist()) {
+                displayWhitelist.add(pkg);
+            }
+        }
+
         for (ResolveInfo resolveInfo : resolveInfos) {
             String packageName = resolveInfo.activityInfo.packageName;
 
@@ -109,7 +118,8 @@ public class WhitelistSettingsActivity extends AppCompatActivity {
             item.setPackageName(packageName);
             item.setAppName(resolveInfo.loadLabel(pm).toString());
             item.setIcon(resolveInfo.activityInfo.loadIcon(pm));
-            item.setChecked(currentWhitelist.contains(packageName));
+            // 如果当前白名单为空，默认勾选推荐应用；否则使用实际白名单
+            item.setChecked(displayWhitelist.contains(packageName));
 
             appList.add(item);
         }

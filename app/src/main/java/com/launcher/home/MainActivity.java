@@ -211,12 +211,6 @@ public class MainActivity extends Activity {
             }
         }, 500);
     }
-                        "豆包 APP 未安装，请先安装豆包",
-                        Toast.LENGTH_LONG).show();
-                }
-            }
-        }, 500);
-    }
 
     /**
      * 加载所有已安装的应用

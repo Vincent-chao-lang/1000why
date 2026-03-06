@@ -102,8 +102,21 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="12dp"
+        android:layout_marginBottom="8dp"
         android:text="管理解锁密码"
+        android:textColor="#FFFFFF"
+        android:background="@color/button_secondary"
+        android:padding="12dp"/>
+
+    <!-- 无障碍服务设置按钮 -->
+    <Button
+        android:id="@+id/accessibility_settings_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="12dp"
+        android:text="设置无障碍服务（返回键拦截）"
         android:textColor="#FFFFFF"
         android:background="@color/button_secondary"
         android:padding="12dp"/>

@@ -31,6 +31,13 @@
             </intent-filter>
         </activity>
 
+        <!-- WhitelistSettingsActivity - 白名单设置 -->
+        <activity
+            android:name=".WhitelistSettingsActivity"
+            android:label="白名单设置"
+            android:exported="false"
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar" />
+
         <!-- 无障碍服务 - 锁定豆包，拦截返回键 -->
         <service
             android:name=".AccessibilityLockService"

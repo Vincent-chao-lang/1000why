@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,27 +50,16 @@ public class MainActivity extends Activity {
     private static final boolean AUTO_LAUNCH_AI = true;  // 启用 AI 锁定
     // ===========================================
 
-    // ========== 白名单配置：只显示这些应用 ==========
-    // 留空则显示所有应用（除了自己）
-    private static final String[] APP_WHITELIST = {
-        // 常用应用示例（取消注释并修改为实际包名）
-        // "com.tencent.mm",              // 微信
-        // "com.tencent.mobileqq",        // QQ
-        // "com.taobao.taobao",           // 淘宝
-        // "com.sdu.didi.psnger",         // 滴滴
-        // "com.ss.android.ugc.aweme",    // 抖音
-        "com.android.settings",
-        "com.android.chrome",
-        "com.larus.nova",
-
-
-    };
-    // ==============================================
+    // 白名单管理器
+    private WhitelistManager whitelistManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // 初始化白名单管理器
+        whitelistManager = new WhitelistManager(this);
 
         initViews();
         loadApps();
@@ -100,6 +90,15 @@ public class MainActivity extends Activity {
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 showAppInfo(position);
                 return true;
+            }
+        });
+
+        // 设置按钮 - 打开白名单设置
+        ImageButton settingsButton = findViewById(R.id.settings_button);
+        settingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openWhitelistSettings();
             }
         });
 
@@ -214,6 +213,10 @@ public class MainActivity extends Activity {
 
         List<ResolveInfo> resolveInfos = pm.queryIntentActivities(intent, 0);
 
+        // 检查是否启用白名单
+        boolean whitelistEnabled = whitelistManager.isWhitelistEnabled();
+        java.util.Set<String> whitelist = whitelistManager.getWhitelist();
+
         for (ResolveInfo resolveInfo : resolveInfos) {
             String packageName = resolveInfo.activityInfo.packageName;
 
@@ -222,16 +225,9 @@ public class MainActivity extends Activity {
                 continue;
             }
 
-            // 白名单过滤：如果设置了白名单，只显示白名单中的应用
-            if (APP_WHITELIST.length > 0) {
-                boolean inWhitelist = false;
-                for (String whitePkg : APP_WHITELIST) {
-                    if (packageName.equals(whitePkg)) {
-                        inWhitelist = true;
-                        break;
-                    }
-                }
-                if (!inWhitelist) {
+            // 白名单过滤：如果启用了白名单，只显示白名单中的应用
+            if (whitelistEnabled && !whitelist.isEmpty()) {
+                if (!whitelist.contains(packageName)) {
                     continue; // 不在白名单中，跳过
                 }
             }
@@ -277,6 +273,14 @@ public class MainActivity extends Activity {
         Toast.makeText(this,
                 "包名: " + appInfo.getPackageName(),
                 Toast.LENGTH_LONG).show();
+    }
+
+    /**
+     * 打开白名单设置界面
+     */
+    private void openWhitelistSettings() {
+        Intent intent = new Intent(this, WhitelistSettingsActivity.class);
+        startActivity(intent);
     }
 
     /**

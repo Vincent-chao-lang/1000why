@@ -18,4 +18,16 @@
         android:padding="16dp"
         android:clipToPadding="false"/>
 
+    <!-- 设置按钮 -->
+    <ImageButton
+        android:id="@+id/settings_button"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="16dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@android:drawable/ic_menu_preferences"
+        android:contentDescription="设置"
+        android:tint="#FFFFFF"/>
+
 </FrameLayout>

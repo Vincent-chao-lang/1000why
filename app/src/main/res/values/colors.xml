@@ -11,4 +11,9 @@
     <color name="background_color">#1a1a2e</color>
     <color name="text_color">#ffffff</color>
     <color name="ic_launcher_background">#1a1a2e</color>
+
+    <!-- 白名单设置界面颜色 -->
+    <color name="top_bar_background">#0f3460</color>
+    <color name="button_background">#667eea</color>
+    <color name="button_secondary">#555577</color>
 </resources>

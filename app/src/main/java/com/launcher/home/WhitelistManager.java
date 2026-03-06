@@ -151,7 +151,11 @@ public class WhitelistManager {
      * 获取自动启动是否启用
      */
     public boolean isAutoLaunchEnabled() {
-        return prefs.getBoolean(KEY_AUTO_LAUNCH_ENABLED, true); // 默认启用
+        // 如果首次使用未完成，返回 false（未启用）
+        if (isFirstTimeSetup()) {
+            return false;
+        }
+        return prefs.getBoolean(KEY_AUTO_LAUNCH_ENABLED, true); // 首次设置后默认启用
     }
 
     /**

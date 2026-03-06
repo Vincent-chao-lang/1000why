@@ -202,6 +202,11 @@ public class WhitelistSettingsActivity extends AppCompatActivity {
         // 白名单功能：如果有勾选应用就启用，否则禁用
         whitelistManager.setWhitelistEnabled(!whitelist.isEmpty());
 
+        // 首次保存时，自动启用自动启动功能
+        if (whitelistManager.isFirstTimeSetup()) {
+            whitelistManager.setAutoLaunchEnabled(true);
+        }
+
         // 标记首次设置已完成
         whitelistManager.setFirstTimeSetupCompleted();
 

@@ -90,8 +90,8 @@
             android:id="@+id/auto_launch_toggle"
             android:layout_width="60dp"
             android:layout_height="32dp"
-            android:textOn="开启"
-            android:textOff="关闭"
+            android:textOn="关闭"
+            android:textOff="启用"
             android:background="@color/button_background"/>
     </LinearLayout>
 

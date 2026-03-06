@@ -33,7 +33,7 @@ public class MainActivity extends Activity {
     private List<AppInfo> appList;
     private AppAdapter appAdapter;
 
-    // 退出锁定计数器
+    // 解锁计数器
     private int unlockPressCount = 0;
     private static final int UNLOCK_PRESS_COUNT = 3;  // 连续点击3次解锁
 
@@ -41,13 +41,6 @@ public class MainActivity extends Activity {
     private boolean volumeUpPressed = false;
     private boolean volumeDownPressed = false;
     private long lastVolumePressTime = 0;
-
-    // ========== AI 助手配置 ==========
-    // 豆包 APP 包名（需要在设备上确认实际包名）
-    private static final String AI_ASSISTANT_PACKAGE = "com.larus.nova";
-    // 开机自动启动 AI 助手
-    private static final boolean AUTO_LAUNCH_AI = true;  // 启用 AI 锁定
-    // ===========================================
 
     // 白名单管理器
     private WhitelistManager whitelistManager;
@@ -64,8 +57,8 @@ public class MainActivity extends Activity {
         loadApps();
 
         // 如果首次使用，不自动启动 AI，让用户先设置
-        // 如果已完成设置，则自动启动用户选择的默认应用
-        if (!whitelistManager.isFirstTimeSetup() && AUTO_LAUNCH_AI) {
+        // 如果已完成设置 且 自动启动启用，则自动启动默认应用
+        if (!whitelistManager.isFirstTimeSetup() && whitelistManager.isAutoLaunchEnabled()) {
             launchAIAssistant();
         }
     }
@@ -134,14 +127,16 @@ public class MainActivity extends Activity {
                             unlockPressCount = 0;
                         } else {
                             int remaining = UNLOCK_PRESS_COUNT - unlockPressCount;
+                            String action = whitelistManager.isAutoLaunchEnabled() ? "关闭自动启动" : "开启自动启动";
                             Toast.makeText(MainActivity.this,
-                                "再点击 " + remaining + " 次解锁",
+                                "再点击 " + remaining + " 次" + action,
                                 Toast.LENGTH_SHORT).show();
                         }
                     } else {
                         unlockPressCount = 1;
+                        String action = whitelistManager.isAutoLaunchEnabled() ? "关闭自动启动" : "开启自动启动";
                         Toast.makeText(MainActivity.this,
-                            "再点击 " + (UNLOCK_PRESS_COUNT - 1) + " 次解锁",
+                            "再点击 " + (UNLOCK_PRESS_COUNT - 1) + " 次" + action,
                             Toast.LENGTH_SHORT).show();
                     }
                     lastClickTime = currentTime;
@@ -152,12 +147,17 @@ public class MainActivity extends Activity {
     }
 
     /**
-     * 解锁 Launcher - 暂时禁用 AI 自动启动
+     * 切换自动启动状态
      */
     private void unlockLauncher() {
-        Toast.makeText(this, "已解锁！可以正常使用桌面了", Toast.LENGTH_LONG).show();
-        // 标记为已解锁，onResume 不会自动启动豆包
-        unlockPressCount = -999;
+        boolean newState = !whitelistManager.isAutoLaunchEnabled();
+        whitelistManager.setAutoLaunchEnabled(newState);
+
+        if (newState) {
+            Toast.makeText(this, "已启用自动启动", Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(this, "已关闭自动启动，可以正常使用桌面", Toast.LENGTH_LONG).show();
+        }
     }
 
     /**
@@ -398,8 +398,8 @@ public class MainActivity extends Activity {
         super.onResume();
 
         // 如果首次使用，不自动启动应用，让用户先设置
-        // 如果已完成设置 且 未解锁，从任何应用返回都自动重新启动默认应用
-        if (!whitelistManager.isFirstTimeSetup() && AUTO_LAUNCH_AI && unlockPressCount != -999) {
+        // 如果已完成设置 且 自动启动启用，从任何应用返回都自动重新启动默认应用
+        if (!whitelistManager.isFirstTimeSetup() && whitelistManager.isAutoLaunchEnabled()) {
             launchAIAssistant();
             return; // 不显示 Launcher 界面
         }
@@ -468,7 +468,8 @@ public class MainActivity extends Activity {
                 unlockPressCount = 0;
             } else {
                 int remaining = UNLOCK_PRESS_COUNT - unlockPressCount;
-                Toast.makeText(this, "再按音量键 " + remaining + " 次", Toast.LENGTH_SHORT).show();
+                String action = whitelistManager.isAutoLaunchEnabled() ? "关闭自动启动" : "开启自动启动";
+                Toast.makeText(this, "再按音量键 " + remaining + " 次" + action, Toast.LENGTH_SHORT).show();
             }
         } else {
             unlockPressCount = 1;

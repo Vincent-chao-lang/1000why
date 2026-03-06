@@ -18,6 +18,7 @@ public class WhitelistManager {
     private static final String KEY_WHITELIST_ENABLED = "whitelist_enabled";
     private static final String KEY_FIRST_TIME_SETUP = "first_time_setup";
     private static final String KEY_DEFAULT_LAUNCH_APP = "default_launch_app";
+    private static final String KEY_AUTO_LAUNCH_ENABLED = "auto_launch_enabled";
 
     private final SharedPreferences prefs;
     private final Context context;
@@ -144,6 +145,28 @@ public class WhitelistManager {
      */
     private String getDefaultLaunchAppFallback() {
         return "com.larus.nova"; // 默认豆包
+    }
+
+    /**
+     * 获取自动启动是否启用
+     */
+    public boolean isAutoLaunchEnabled() {
+        return prefs.getBoolean(KEY_AUTO_LAUNCH_ENABLED, true); // 默认启用
+    }
+
+    /**
+     * 设置自动启动是否启用
+     */
+    public void setAutoLaunchEnabled(boolean enabled) {
+        prefs.edit().putBoolean(KEY_AUTO_LAUNCH_ENABLED, enabled).apply();
+    }
+
+    /**
+     * 切换自动启动状态
+     */
+    public void toggleAutoLaunch() {
+        boolean currentState = isAutoLaunchEnabled();
+        setAutoLaunchEnabled(!currentState);
     }
 
     /**

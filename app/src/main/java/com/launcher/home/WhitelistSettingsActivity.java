@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -64,6 +65,19 @@ public class WhitelistSettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 finish();
+            }
+        });
+
+        // 自动启动开关
+        ToggleButton autoLaunchToggle = findViewById(R.id.auto_launch_toggle);
+        autoLaunchToggle.setChecked(whitelistManager.isAutoLaunchEnabled());
+        autoLaunchToggle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ToggleButton toggle = (ToggleButton) v;
+                whitelistManager.setAutoLaunchEnabled(toggle.isChecked());
+                String status = toggle.isChecked() ? "已启用自动启动" : "已关闭自动启动";
+                Toast.makeText(WhitelistSettingsActivity.this, status, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -185,7 +199,7 @@ public class WhitelistSettingsActivity extends AppCompatActivity {
         // 保存默认启动应用
         whitelistManager.setDefaultLaunchApp(defaultLaunchApp);
 
-        // 如果白名单不为空，启用白名单功能
+        // 白名单功能：如果有勾选应用就启用，否则禁用
         whitelistManager.setWhitelistEnabled(!whitelist.isEmpty());
 
         // 标记首次设置已完成
@@ -199,7 +213,8 @@ public class WhitelistSettingsActivity extends AppCompatActivity {
             }
         }
 
-        Toast.makeText(this, "已保存 " + whitelist.size() + " 个应用\n默认启动: " + defaultAppName, Toast.LENGTH_SHORT).show();
+        String autoLaunchStatus = whitelistManager.isAutoLaunchEnabled() ? "开启" : "关闭";
+        Toast.makeText(this, "已保存 " + whitelist.size() + " 个应用\n默认启动: " + defaultAppName + "\n自动启动: " + autoLaunchStatus, Toast.LENGTH_SHORT).show();
 
         // 返回主界面
         finish();

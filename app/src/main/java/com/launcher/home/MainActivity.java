@@ -17,6 +17,9 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.app.AlertDialog;
+import android.widget.EditText;
+import android.text.InputType;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -147,9 +150,54 @@ public class MainActivity extends Activity {
     }
 
     /**
-     * 切换自动启动状态
+     * 切换自动启动状态 - 需要密码验证
      */
     private void unlockLauncher() {
+        // 检查是否设置了密码
+        if (whitelistManager.hasUnlockPassword()) {
+            // 显示密码输入对话框
+            showPasswordDialog();
+        } else {
+            // 没有设置密码，直接切换状态
+            toggleAutoLaunchState();
+        }
+    }
+
+    /**
+     * 显示密码验证对话框
+     */
+    private void showPasswordDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("输入密码");
+
+        // 设置密码输入框
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        input.setHint("请输入解锁密码");
+        input.setPadding(50, 30, 50, 30);
+        builder.setView(input);
+
+        builder.setPositiveButton("确定", (dialog, which) -> {
+            String password = input.getText().toString();
+            if (whitelistManager.verifyUnlockPassword(password)) {
+                // 密码正确，切换状态
+                toggleAutoLaunchState();
+            } else {
+                Toast.makeText(this, "密码错误", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setNegativeButton("取消", (dialog, which) -> {
+            dialog.cancel();
+        });
+
+        builder.show();
+    }
+
+    /**
+     * 执行自动启动状态切换
+     */
+    private void toggleAutoLaunchState() {
         boolean newState = !whitelistManager.isAutoLaunchEnabled();
         whitelistManager.setAutoLaunchEnabled(newState);
 

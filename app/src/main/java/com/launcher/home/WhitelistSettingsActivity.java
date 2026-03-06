@@ -3,14 +3,17 @@ package com.launcher.home;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
+import android.text.InputType;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -105,6 +108,15 @@ public class WhitelistSettingsActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 selectNone();
+            }
+        });
+
+        // 密码管理按钮
+        Button passwordManageButton = findViewById(R.id.password_manage_button);
+        passwordManageButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPasswordManageDialog();
             }
         });
     }
@@ -210,19 +222,178 @@ public class WhitelistSettingsActivity extends AppCompatActivity {
         // 标记首次设置已完成
         whitelistManager.setFirstTimeSetupCompleted();
 
+        // 检查是否需要设置密码
+        boolean autoLaunchEnabled = whitelistManager.isAutoLaunchEnabled();
+        boolean hasPassword = whitelistManager.hasUnlockPassword();
+
+        if (autoLaunchEnabled && !hasPassword) {
+            // 自动启动已启用但未设置密码，提示设置密码
+            showPasswordSetupDialog(whitelist, defaultLaunchApp);
+        } else {
+            // 不需要设置密码，直接保存并返回
+            finishSave(whitelist, defaultLaunchApp);
+        }
+    }
+
+    /**
+     * 显示密码设置对话框
+     */
+    private void showPasswordSetupDialog(Set<String> whitelist, String savedDefaultLaunchApp) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("设置解锁密码");
+        builder.setMessage("自动启动已启用，建议设置密码保护解锁功能。\n\n解锁时需要输入密码才能关闭自动启动。");
+
+        // 设置密码输入框
+        final EditText passwordInput = new EditText(this);
+        passwordInput.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        passwordInput.setHint("请输入密码（至少4位）");
+        passwordInput.setPadding(50, 30, 50, 30);
+        builder.setView(passwordInput);
+
+        builder.setPositiveButton("设置密码", (dialog, which) -> {
+            String password = passwordInput.getText().toString();
+            if (password.length() >= 4) {
+                whitelistManager.setUnlockPassword(password);
+                Toast.makeText(this, "密码已设置", Toast.LENGTH_SHORT).show();
+                finishSave(whitelist, savedDefaultLaunchApp);
+            } else {
+                Toast.makeText(this, "密码长度至少4位", Toast.LENGTH_SHORT).show();
+                finishSave(whitelist, savedDefaultLaunchApp);
+            }
+        });
+
+        builder.setNegativeButton("跳过", (dialog, which) -> {
+            Toast.makeText(this, "未设置密码，解锁时无需验证", Toast.LENGTH_SHORT).show();
+            finishSave(whitelist, savedDefaultLaunchApp);
+        });
+
+        builder.show();
+    }
+
+    /**
+     * 完成保存并显示结果
+     */
+    private void finishSave(Set<String> whitelist, String savedDefaultLaunchApp) {
         String defaultAppName = "未设置";
         for (AppSelectorItem item : appList) {
-            if (item.getPackageName().equals(defaultLaunchApp)) {
+            if (item.getPackageName().equals(savedDefaultLaunchApp)) {
                 defaultAppName = item.getAppName();
                 break;
             }
         }
 
         String autoLaunchStatus = whitelistManager.isAutoLaunchEnabled() ? "开启" : "关闭";
-        Toast.makeText(this, "已保存 " + whitelist.size() + " 个应用\n默认启动: " + defaultAppName + "\n自动启动: " + autoLaunchStatus, Toast.LENGTH_SHORT).show();
+        String passwordStatus = whitelistManager.hasUnlockPassword() ? "（已设置密码）" : "";
+        Toast.makeText(this, "已保存 " + whitelist.size() + " 个应用\n默认启动: " + defaultAppName + "\n自动启动: " + autoLaunchStatus + passwordStatus, Toast.LENGTH_SHORT).show();
 
         // 返回主界面
         finish();
+    }
+
+    /**
+     * 显示密码管理对话框
+     */
+    private void showPasswordManageDialog() {
+        boolean hasPassword = whitelistManager.hasUnlockPassword();
+
+        if (hasPassword) {
+            // 已设置密码，显示选项：修改密码、移除密码
+            showPasswordOptionsDialog();
+        } else {
+            // 未设置密码，直接显示设置密码对话框
+            showSetPasswordDialog();
+        }
+    }
+
+    /**
+     * 显示密码选项对话框（已设置密码时）
+     */
+    private void showPasswordOptionsDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("密码管理");
+        builder.setMessage("密码已设置，请选择操作：");
+
+        builder.setPositiveButton("修改密码", (dialog, which) -> {
+            // 先验证旧密码
+            showVerifyPasswordDialog(true);
+        });
+
+        builder.setNegativeButton("移除密码", (dialog, which) -> {
+            // 先验证旧密码
+            showVerifyPasswordDialog(false);
+        });
+
+        builder.setNeutralButton("取消", (dialog, which) -> {
+            dialog.cancel();
+        });
+
+        builder.show();
+    }
+
+    /**
+     * 显示旧密码验证对话框
+     * @param isChange true=修改密码, false=移除密码
+     */
+    private void showVerifyPasswordDialog(final boolean isChange) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("验证密码");
+
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        input.setHint("请输入当前密码");
+        input.setPadding(50, 30, 50, 30);
+        builder.setView(input);
+
+        builder.setPositiveButton("确定", (dialog, which) -> {
+            String password = input.getText().toString();
+            if (whitelistManager.verifyUnlockPassword(password)) {
+                if (isChange) {
+                    showSetPasswordDialog();
+                } else {
+                    // 移除密码
+                    whitelistManager.clearUnlockPassword();
+                    Toast.makeText(this, "密码已移除", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(this, "密码错误", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setNegativeButton("取消", (dialog, which) -> {
+            dialog.cancel();
+        });
+
+        builder.show();
+    }
+
+    /**
+     * 显示设置密码对话框
+     */
+    private void showSetPasswordDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("设置密码");
+
+        final EditText input = new EditText(this);
+        input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+        input.setHint("请输入密码（至少4位）");
+        input.setPadding(50, 30, 50, 30);
+        builder.setView(input);
+
+        builder.setPositiveButton("确定", (dialog, which) -> {
+            String password = input.getText().toString();
+            if (password.length() >= 4) {
+                whitelistManager.setUnlockPassword(password);
+                Toast.makeText(this, "密码已设置", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(this, "密码长度至少4位", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        builder.setNegativeButton("取消", (dialog, which) -> {
+            dialog.cancel();
+        });
+
+        builder.show();
     }
 
     /**

@@ -19,6 +19,7 @@ public class WhitelistManager {
     private static final String KEY_FIRST_TIME_SETUP = "first_time_setup";
     private static final String KEY_DEFAULT_LAUNCH_APP = "default_launch_app";
     private static final String KEY_AUTO_LAUNCH_ENABLED = "auto_launch_enabled";
+    private static final String KEY_UNLOCK_PASSWORD = "unlock_password";
 
     private final SharedPreferences prefs;
     private final Context context;
@@ -182,5 +183,42 @@ public class WhitelistManager {
             "com.android.chrome",
             "com.larus.nova"  // 豆包 AI
         };
+    }
+
+    /**
+     * 获取解锁密码
+     */
+    public String getUnlockPassword() {
+        return prefs.getString(KEY_UNLOCK_PASSWORD, "");
+    }
+
+    /**
+     * 设置解锁密码
+     */
+    public void setUnlockPassword(String password) {
+        prefs.edit().putString(KEY_UNLOCK_PASSWORD, password).apply();
+    }
+
+    /**
+     * 检查是否设置了密码
+     */
+    public boolean hasUnlockPassword() {
+        String password = getUnlockPassword();
+        return password != null && !password.isEmpty();
+    }
+
+    /**
+     * 验证密码是否正确
+     */
+    public boolean verifyUnlockPassword(String input) {
+        String storedPassword = getUnlockPassword();
+        return storedPassword.equals(input);
+    }
+
+    /**
+     * 清除密码
+     */
+    public void clearUnlockPassword() {
+        prefs.edit().remove(KEY_UNLOCK_PASSWORD).apply();
     }
 }

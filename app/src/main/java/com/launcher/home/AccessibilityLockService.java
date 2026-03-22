@@ -22,6 +22,13 @@ public class AccessibilityLockService extends AccessibilityService {
      */
     public static boolean autoLaunchEnabled = false;
 
+    /**
+     * 运行模式（静态变量，用于跨进程通信）
+     * true = 默认桌面模式
+     * false = Kiosk 沉浸式模式
+     */
+    public static boolean isDefaultLauncherMode = true;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -45,22 +52,52 @@ public class AccessibilityLockService extends AccessibilityService {
     }
 
     /**
-     * 拦截返回键 - 只有在自动启动启用时才拦截
+     * 拦截系统按键 - Kiosk 模式下拦截更多按键
      * API 16+ 支持
      */
     @Override
     protected boolean onKeyEvent(android.view.KeyEvent event) {
-        // 检查是否启用自动启动
-        if (!autoLaunchEnabled) {
-            // 自动启动未启用，不拦截任何按键
-            return super.onKeyEvent(event);
+        // Kiosk 模式（非默认桌面模式）：拦截所有系统导航按键
+        if (!isDefaultLauncherMode && autoLaunchEnabled) {
+            int keyCode = event.getKeyCode();
+
+            // 拦截返回键
+            if (keyCode == android.view.KeyEvent.KEYCODE_BACK) {
+                return true; // 消费掉返回事件
+            }
+
+            // 拦截 Home 键（部分设备有效，取决于系统实现）
+            if (keyCode == android.view.KeyEvent.KEYCODE_HOME) {
+                return true;
+            }
+
+            // 拦截多任务键（部分设备有效）
+            if (keyCode == android.view.KeyEvent.KEYCODE_APP_SWITCH) {
+                return true;
+            }
+
+            // 拦截菜单键
+            if (keyCode == android.view.KeyEvent.KEYCODE_MENU) {
+                return true;
+            }
+
+            // 拦截搜索键
+            if (keyCode == android.view.KeyEvent.KEYCODE_SEARCH) {
+                return true;
+            }
+
+            // 拦截语音助手键
+            if (keyCode == android.view.KeyEvent.KEYCODE_ASSIST) {
+                return true;
+            }
         }
 
-        // 自动启动启用中，拦截返回键以锁定在豆包APP
-        if (event.getKeyCode() == android.view.KeyEvent.KEYCODE_BACK &&
-                isTargetAppForeground()) {
-            // 消费掉返回事件，不传递给系统
-            return true;  // 返回true表示事件被消费
+        // 默认桌面模式：只在启用自动启动时拦截返回键
+        if (isDefaultLauncherMode && autoLaunchEnabled) {
+            if (event.getKeyCode() == android.view.KeyEvent.KEYCODE_BACK &&
+                    isTargetAppForeground()) {
+                return true;
+            }
         }
 
         return super.onKeyEvent(event);

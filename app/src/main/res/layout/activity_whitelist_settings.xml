@@ -68,6 +68,18 @@
         android:textColor="#667eea"
         android:id="@+id/default_launch_hint"/>
 
+    <!-- 运行模式提示 -->
+    <TextView
+        android:id="@+id/mode_hint"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="8dp"
+        android:text="运行模式: 检测中..."
+        android:textSize="12sp"
+        android:textColor="#FFA500"/>
+
     <!-- 自动启动开关 -->
     <LinearLayout
         android:layout_width="match_parent"
@@ -94,6 +106,19 @@
             android:textOff="启用"
             android:background="@color/button_background"/>
     </LinearLayout>
+
+    <!-- 设为默认桌面按钮 -->
+    <Button
+        android:id="@+id/set_default_launcher_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="8dp"
+        android:text="设为默认桌面"
+        android:textColor="#FFFFFF"
+        android:background="@color/button_secondary"
+        android:padding="12dp"/>
 
     <!-- 密码管理按钮 -->
     <Button

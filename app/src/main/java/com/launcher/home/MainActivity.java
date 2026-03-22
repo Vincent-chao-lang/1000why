@@ -48,6 +48,9 @@ public class MainActivity extends Activity {
     // 白名单管理器
     private WhitelistManager whitelistManager;
 
+    // 运行模式：true = 默认桌面模式，false = Kiosk 沉浸式模式
+    private boolean isDefaultLauncherMode = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,11 +59,22 @@ public class MainActivity extends Activity {
         // 初始化白名单管理器
         whitelistManager = new WhitelistManager(this);
 
+        // 检测是否为默认桌面
+        isDefaultLauncherMode = isDefaultLauncher();
+
         // 同步无障碍服务的状态
         AccessibilityLockService.autoLaunchEnabled = whitelistManager.isAutoLaunchEnabled();
+        // 同步运行模式到无障碍服务
+        AccessibilityLockService.isDefaultLauncherMode = isDefaultLauncherMode;
 
         initViews();
         loadApps();
+
+        // 设置 Kiosk 模式（如果不是默认桌面）
+        setupKioskMode();
+
+        // 显示运行模式提示
+        showModeHint();
 
         // 如果首次使用，不自动启动 AI，让用户先设置
         // 如果已完成设置 且 自动启动启用，则自动启动默认应用
@@ -350,6 +364,32 @@ public class MainActivity extends Activity {
     }
 
     /**
+     * 显示运行模式提示
+     */
+    private void showModeHint() {
+        // 检查是否已显示过提示
+        SharedPreferences prefs = getSharedPreferences("mode_hint_prefs", MODE_PRIVATE);
+        boolean hintShown = prefs.getBoolean("kiosk_hint_shown", false);
+
+        if (!isDefaultLauncherMode && !hintShown) {
+            // Kiosk 模式首次进入，显示提示
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("进入沉浸式 AI 模式");
+            builder.setMessage("已进入沉浸式 AI 助手模式，系统按键已被锁定。\n\n"
+                    + "退出方法：\n"
+                    + "1. 连续点击屏幕 3 次\n"
+                    + "2. 输入密码即可退出\n\n"
+                    + "请确保您已记住密码！");
+            builder.setPositiveButton("知道了", (dialog, which) -> {
+                // 标记提示已显示
+                prefs.edit().putBoolean("kiosk_hint_shown", true).apply();
+            });
+            builder.setCancelable(false);
+            builder.show();
+        }
+    }
+
+    /**
      * 打开白名单设置界面
      */
     private void openWhitelistSettings() {
@@ -448,6 +488,9 @@ public class MainActivity extends Activity {
     protected void onResume() {
         super.onResume();
 
+        // 重新应用 Kiosk 模式
+        setupKioskMode();
+
         // 如果首次使用，不自动启动应用，让用户先设置
         // 如果已完成设置 且 自动启动启用，从任何应用返回都自动重新启动默认应用
         if (!whitelistManager.isFirstTimeSetup() && whitelistManager.isAutoLaunchEnabled()) {
@@ -459,6 +502,15 @@ public class MainActivity extends Activity {
         if (appAdapter != null) {
             appList.clear();
             loadApps();
+        }
+    }
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        super.onWindowFocusChanged(hasFocus);
+        if (hasFocus && !isDefaultLauncherMode) {
+            // 窗口获得焦点时，重新应用 Kiosk 模式
+            setupKioskMode();
         }
     }
 
@@ -526,5 +578,73 @@ public class MainActivity extends Activity {
             unlockPressCount = 1;
         }
         lastVolumePressTime = currentTime;
+    }
+
+    /**
+     * 检测是否为默认桌面应用
+     */
+    private boolean isDefaultLauncher() {
+        PackageManager pm = getPackageManager();
+        Intent homeIntent = new Intent(Intent.ACTION_MAIN);
+        homeIntent.addCategory(Intent.CATEGORY_HOME);
+        ResolveInfo defaultLauncher = pm.resolveActivity(homeIntent, PackageManager.MATCH_DEFAULT_ONLY);
+
+        if (defaultLauncher != null) {
+            String defaultPackage = defaultLauncher.activityInfo.packageName;
+            return defaultPackage.equals(getPackageName());
+        }
+        return false;
+    }
+
+    /**
+     * 设置沉浸式 Kiosk 模式
+     * 隐藏状态栏、导航栏，禁止系统手势
+     */
+    private void setupKioskMode() {
+        if (isDefaultLauncherMode) {
+            // 默认桌面模式，不启用 Kiosk 模式
+            return;
+        }
+
+        // 设置全屏沉浸式模式
+        View decorView = getWindow().getDecorView();
+        int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE;
+
+        decorView.setSystemUiVisibility(uiOptions);
+
+        // 禁止状态栏下拉
+        WindowManager.LayoutParams params = getWindow().getAttributes();
+        params.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;
+        params.flags |= WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
+        params.flags |= WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR;
+        getWindow().setAttributes(params);
+
+        // 设置为全屏模式
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        // 禁止截屏（可选）
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
+    }
+
+    /**
+     * 退出 Kiosk 模式
+     */
+    private void exitKioskMode() {
+        View decorView = getWindow().getDecorView();
+        decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+
+        WindowManager.LayoutParams params = getWindow().getAttributes();
+        params.flags &= ~WindowManager.LayoutParams.FLAG_FULLSCREEN;
+        params.flags &= ~WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
+        params.flags &= ~WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR;
+        params.flags &= ~WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
+        params.flags &= ~WindowManager.LayoutParams.FLAG_SECURE;
+        getWindow().setAttributes(params);
     }
 }

@@ -133,6 +133,18 @@ public class WhitelistSettingsActivity extends AppCompatActivity {
                 openAccessibilitySettings();
             }
         });
+
+        // 设为默认桌面按钮
+        Button setDefaultLauncherButton = findViewById(R.id.set_default_launcher_button);
+        setDefaultLauncherButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openDefaultLauncherSettings();
+            }
+        });
+
+        // 更新运行模式提示
+        updateModeHint();
     }
 
     /**
@@ -147,6 +159,61 @@ public class WhitelistSettingsActivity extends AppCompatActivity {
         } catch (Exception e) {
             Toast.makeText(this, "无法打开设置页面，请手动前往：设置 → 辅助功能 → 无障碍", Toast.LENGTH_LONG).show();
         }
+    }
+
+    /**
+     * 打开默认桌面设置
+     */
+    private void openDefaultLauncherSettings() {
+        try {
+            // 尝试打开默认应用设置页面
+            android.content.Intent intent = new android.content.Intent(android.provider.Settings.ACTION_HOME_SETTINGS);
+            startActivity(intent);
+            Toast.makeText(this, "请在设置中选择「AI手机助手」作为默认桌面", Toast.LENGTH_LONG).show();
+        } catch (Exception e) {
+            // 如果无法打开默认应用设置，尝试打开应用设置
+            try {
+                android.content.Intent intent = new android.content.Intent(android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+                intent.setData(android.net.Uri.parse("package:" + getPackageName()));
+                startActivity(intent);
+                Toast.makeText(this, "请设为默认桌面（不同品牌路径不同）", Toast.LENGTH_LONG).show();
+            } catch (Exception e2) {
+                Toast.makeText(this, "请手动前往：设置 → 应用 → 默认应用 → 桌面启动器", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    /**
+     * 更新运行模式提示
+     */
+    private void updateModeHint() {
+        TextView modeHint = findViewById(R.id.mode_hint);
+        if (modeHint != null) {
+            boolean isDefaultLauncher = isDefaultLauncher();
+            if (isDefaultLauncher) {
+                modeHint.setText("运行模式: 默认桌面模式 ✓");
+                modeHint.setTextColor(getColor(android.R.color.holo_green_dark));
+            } else {
+                modeHint.setText("运行模式: 沉浸式 Kiosk 模式 (可设为默认桌面)");
+                modeHint.setTextColor(getColor(android.R.color.holo_orange_dark));
+            }
+        }
+    }
+
+    /**
+     * 检测是否为默认桌面
+     */
+    private boolean isDefaultLauncher() {
+        PackageManager pm = getPackageManager();
+        android.content.Intent homeIntent = new android.content.Intent(android.content.Intent.ACTION_MAIN);
+        homeIntent.addCategory(android.content.Intent.CATEGORY_HOME);
+        android.content.pm.ResolveInfo defaultLauncher = pm.resolveActivity(homeIntent, PackageManager.MATCH_DEFAULT_ONLY);
+
+        if (defaultLauncher != null) {
+            String defaultPackage = defaultLauncher.activityInfo.packageName;
+            return defaultPackage.equals(getPackageName());
+        }
+        return false;
     }
 
     /**

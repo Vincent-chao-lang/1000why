@@ -4,12 +4,12 @@ plugins {
 
 android {
     namespace 'com.launcher.home'
-    compileSdk 34
+    compileSdk 30
 
     defaultConfig {
         applicationId "com.launcher.home"
         minSdk 26
-        targetSdk 34
+        targetSdk 30
         versionCode 1
         versionName "1.0"
     }

@@ -4,7 +4,7 @@ plugins {
 
 android {
     namespace 'com.launcher.home'
-    compileSdk 33
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.launcher.home"

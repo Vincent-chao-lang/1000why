@@ -304,8 +304,8 @@ public class MainActivity extends Activity {
         List<ResolveInfo> resolveInfos = pm.queryIntentActivities(intent, 0);
 
         // 检查是否启用白名单
-        boolean whitelistEnabled = whitelistManager.isWhitelistEnabled();
         java.util.Set<String> whitelist = whitelistManager.getWhitelist();
+        boolean whitelistEnabled = whitelistManager.isWhitelistEnabled();
 
         for (ResolveInfo resolveInfo : resolveInfos) {
             String packageName = resolveInfo.activityInfo.packageName;
@@ -315,11 +315,9 @@ public class MainActivity extends Activity {
                 continue;
             }
 
-            // 白名单过滤：如果启用了白名单，只显示白名单中的应用
-            if (whitelistEnabled && !whitelist.isEmpty()) {
-                if (!whitelist.contains(packageName)) {
-                    continue; // 不在白名单中，跳过
-                }
+            // 白名单过滤：如果启用了白名单且有勾选应用，只显示白名单中的应用
+            if (whitelistEnabled && !whitelist.isEmpty() && !whitelist.contains(packageName)) {
+                continue; // 不在白名单中，跳过
             }
 
             AppInfo appInfo = new AppInfo();

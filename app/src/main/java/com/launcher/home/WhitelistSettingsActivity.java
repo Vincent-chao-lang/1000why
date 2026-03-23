@@ -306,8 +306,8 @@ public class WhitelistSettingsActivity extends AppCompatActivity {
         // 保存默认启动应用
         whitelistManager.setDefaultLaunchApp(defaultLaunchApp);
 
-        // 白名单功能：如果有勾选应用就启用，否则禁用
-        whitelistManager.setWhitelistEnabled(!whitelist.isEmpty());
+        // 白名单功能：只要保存了白名单就启用过滤（空白名单=显示所有应用）
+        whitelistManager.setWhitelistEnabled(true);
 
         // 首次保存时，自动启用自动启动功能
         if (whitelistManager.isFirstTimeSetup()) {

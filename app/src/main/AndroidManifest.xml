@@ -8,8 +8,6 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <!-- 屏幕保持唤醒 - Kiosk 模式需要 -->
     <uses-permission android:name="android.permission.WAKE_LOCK" />
-    <!-- 防止截屏 - Kiosk 模式可选 -->
-    <uses-permission android:name="android.permission.FLAG_SECURE" />
 
     <application
         android:allowBackup="true"

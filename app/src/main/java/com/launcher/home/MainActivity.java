@@ -629,9 +629,6 @@ public class MainActivity extends Activity {
 
         // 设置为全屏模式
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
-        // 禁止截屏（可选）
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_SECURE);
     }
 
     /**
@@ -646,7 +643,6 @@ public class MainActivity extends Activity {
         params.flags &= ~WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN;
         params.flags &= ~WindowManager.LayoutParams.FLAG_LAYOUT_INSET_DECOR;
         params.flags &= ~WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON;
-        params.flags &= ~WindowManager.LayoutParams.FLAG_SECURE;
         getWindow().setAttributes(params);
     }
 }

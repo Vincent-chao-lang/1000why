@@ -1,0 +1,21 @@
+{
+  "name": "openclaw-android-skills",
+  "version": "1.0.0",
+  "description": "OpenClaw Skills for Android Development",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "openclaw",
+    "skill",
+    "android",
+    "ci-cd"
+  ],
+  "author": "AI手机助手团队",
+  "license": "MIT",
+  "dependencies": {
+    "fs-extra": "^11.2.0",
+    "axios": "^1.7.9"
+  }
+}

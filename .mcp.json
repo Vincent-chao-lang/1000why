@@ -1,0 +1,15 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "mcp-server-filesystem",
+      "args": [
+        "./app",
+        "./docs",
+        "./assets",
+        "./scripts",
+        "./.claude",
+        "./.github"
+      ]
+    }
+  }
+}
